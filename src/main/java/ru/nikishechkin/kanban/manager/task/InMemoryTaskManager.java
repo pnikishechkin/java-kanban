@@ -8,6 +8,7 @@ import ru.nikishechkin.kanban.model.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -278,10 +279,12 @@ public class InMemoryTaskManager implements TaskManager {
         // Удаление входящих в эпик подзадач
         for (Integer subTaskId : epic.getSubTasksIds()) {
             subTasks.remove(subTaskId);
+            historyManager.remove(subTaskId);
         }
 
         // Удаление переданной задачи
         epics.remove(id);
+        historyManager.remove(id);
     }
 
     /**
@@ -308,7 +311,8 @@ public class InMemoryTaskManager implements TaskManager {
         this.updateEpicStatus(subTask.getEpicId());
 
         // Удаление подзадачи из общей коллекции
-        this.subTasks.remove(id);
+        subTasks.remove(id);
+        historyManager.remove(id);
     }
 
     /**
@@ -319,6 +323,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTask(int id) {
         tasks.remove(id);
+        historyManager.remove(id);
     }
 
     /**
@@ -388,7 +393,7 @@ public class InMemoryTaskManager implements TaskManager {
      * @return список с последними просмотренными задачами
      */
     @Override
-    public ArrayList<Task> getHistory() {
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 

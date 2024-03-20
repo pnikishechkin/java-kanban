@@ -5,6 +5,7 @@ import ru.nikishechkin.kanban.model.SubTask;
 import ru.nikishechkin.kanban.model.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
     ArrayList<Epic> getEpics();
@@ -45,5 +46,5 @@ public interface TaskManager {
 
     ArrayList<SubTask> getListEpicSubTasks(int epicId);
 
-    ArrayList<Task> getHistory();
+    List<Task> getHistory();
 }

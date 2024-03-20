@@ -248,7 +248,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void getHistory_historyCorrect() {
+    void getHistory_historyUpdate() {
         // given
         initData();
 
@@ -266,20 +266,78 @@ class InMemoryTaskManagerTest {
         taskManager.getSubTaskById(3);
 
         // then
-        Assertions.assertEquals(4, taskManager.getHistory().get(0).getId());
-        Assertions.assertEquals(0, taskManager.getHistory().get(1).getId());
-        Assertions.assertEquals(3, taskManager.getHistory().get(9).getId());
-        Assertions.assertEquals(10, taskManager.getHistory().size());
+        Assertions.assertEquals(7, taskManager.getHistory().size());
+        Assertions.assertEquals(1, taskManager.getHistory().get(0).getId());
+        Assertions.assertEquals(2, taskManager.getHistory().get(1).getId());
+        Assertions.assertEquals(3, taskManager.getHistory().get(6).getId());
 
         // when
         taskManager.getSubTaskById(5);
         taskManager.getSubTaskById(6);
 
         // then
-        Assertions.assertEquals(5, taskManager.getHistory().get(8).getId());
-        Assertions.assertEquals(6, taskManager.getHistory().get(9).getId());
-        Assertions.assertEquals(10, taskManager.getHistory().size());
+        Assertions.assertEquals(7, taskManager.getHistory().size());
+        Assertions.assertEquals(5, taskManager.getHistory().get(5).getId());
+        Assertions.assertEquals(6, taskManager.getHistory().get(6).getId());
+    }
 
+    @Test
+    void removeSubTask_epicUpdateId() {
+        // given
+        initData();
+
+        // when
+        taskManager.deleteSubTask(1);
+        taskManager.deleteSubTask(3);
+
+        // then
+        Assertions.assertEquals(1, taskManager.getEpicById(0).getSubTasksIds().size());
+        Assertions.assertTrue(taskManager.getEpicById(0).getSubTasksIds().contains(2));
+        Assertions.assertFalse(taskManager.getEpicById(0).getSubTasksIds().contains(1));
+        Assertions.assertFalse(taskManager.getEpicById(0).getSubTasksIds().contains(3));
+    }
+
+    @Test
+    void removeTasks_historyUpdate() {
+        // given
+        initData();
+
+        // when
+        // Просмотрели эпики, подзадачи
+        taskManager.getEpicById(0);
+        taskManager.getEpicById(4);
+        taskManager.getEpicById(0);
+        taskManager.getSubTaskById(1);
+        taskManager.getSubTaskById(3);
+        taskManager.getSubTaskById(2);
+        taskManager.getSubTaskById(6);
+        taskManager.getSubTaskById(5);
+        taskManager.getEpicById(4);
+        taskManager.getEpicById(0);
+        taskManager.getSubTaskById(3);
+
+        // Количество уникальных задач - 7
+        Assertions.assertEquals(7, taskManager.getHistory().size());
+        Assertions.assertEquals(0, taskManager.getHistory().get(5).getId());
+        Assertions.assertEquals(3, taskManager.getHistory().get(6).getId());
+
+        // Удаляем эпик с ID 0, привязанные задачи: ID 1, 2, 3
+        taskManager.deleteEpic(0);
+
+        Assertions.assertEquals(3, taskManager.getHistory().size());
+        Assertions.assertEquals(4, taskManager.getHistory().get(2).getId());
+
+        // Просмотрели задачу с идентификатором 11
+        taskManager.getTaskById(11);
+
+        Assertions.assertEquals(4, taskManager.getHistory().size());
+        Assertions.assertEquals(11, taskManager.getHistory().get(3).getId());
+
+        // Удалили задачу с идентификатором 11
+        taskManager.deleteTask(11);
+
+        Assertions.assertEquals(3, taskManager.getHistory().size());
+        Assertions.assertEquals(4, taskManager.getHistory().get(2).getId());
     }
 
 }
